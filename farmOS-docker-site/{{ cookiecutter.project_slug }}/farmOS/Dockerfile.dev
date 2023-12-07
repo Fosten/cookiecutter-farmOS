@@ -1,0 +1,62 @@
+# Inherit from the farmOS {{ cookiecutter.farmos_branch_version }}-dev image on Docker Hub.
+FROM farmos/farmos:{{ cookiecutter.farmos_branch_version }}-dev
+ARG FARM_CONFIG_EXISTS={{ cookiecutter.farm_site_config_exists }}
+ARG FARM_MODULE_EXISTS={{ cookiecutter.farm_contrib_module_exists }}
+
+# Install `jq` to help in extracting the farmOS version below.
+RUN apt-get update && apt-get install -y jq
+
+# Replace exisiting farmOS codebase.
+RUN rm -r /opt/drupal /var/farmOS/* && chown www-data:www-data /var/farmOS
+WORKDIR /var/farmOS
+COPY --chown=www-data:www-data . .
+# Add Configurartions for PHP CodeSniffer, PHPStan, PHPUnit.
+COPY --chown=www-data:www-data tests/* .
+
+# Install composer as the www-data user.
+USER www-data
+
+# Configure composer to use a github access token for accessing private repos.
+#RUN --mount=type=secret,id=github_access_token,uid=1000 \
+#  composer config github-oauth.github.com $(cat /run/secrets/github_access_token)
+
+# Install composer.
+RUN composer config cache-dir /var/www/.composer
+RUN composer require "farmos/farmos:{{ cookiecutter.farmos_branch_version }}-dev" --no-install
+RUN if [ "$FARM_CONFIG_EXISTS" = "1" ]; then \
+  composer require "{{ cookiecutter.github_organization }}/{{ cookiecutter.farm_site_config_name }}:*" --no-install \
+  ;fi
+RUN if [ "$FARM_MODULE_EXISTS" = "1" ]; then \
+  composer require "{{ cookiecutter.github_organization }}/{{ cookiecutter.farm_contrib_module_name }}:*" --no-install \
+  ;fi
+RUN composer install
+RUN composer clear-cache
+
+# Configure PHPUnit.
+RUN cp -p /var/farmOS/web/core/phpunit.xml.dist /var/farmOS/phpunit.xml \
+  && sed -i 's|bootstrap="tests/bootstrap.php"|bootstrap="web/core/tests/bootstrap.php"|g' /var/farmOS/phpunit.xml \
+  && sed -i '/failOnWarning="true"/a \         failOnIncomplete="true"' /var/farmOS/phpunit.xml \
+  && sed -i '/failOnWarning="true"/a \         failOnSkipped="true"' /var/farmOS/phpunit.xml \
+  && sed -i 's|name="SIMPLETEST_BASE_URL" value=""|name="SIMPLETEST_BASE_URL" value="http://www"|g' /var/farmOS/phpunit.xml \
+  && sed -i 's|name="SIMPLETEST_DB" value=""|name="SIMPLETEST_DB" value="pgsql://farm:farm@db/farm"|g' /var/farmOS/phpunit.xml \
+  && sed -i 's|name="BROWSERTEST_OUTPUT_DIRECTORY" value=""|name="BROWSERTEST_OUTPUT_DIRECTORY" value="/var/www/html/sites/simpletest/browser_output"|g' /var/farmOS/phpunit.xml \
+  && sed -i 's|name="MINK_DRIVER_ARGS_WEBDRIVER" value='\'''\''|name="MINK_DRIVER_ARGS_WEBDRIVER" value='\''["chrome", { "chromeOptions": { "w3c": false, "args": ["--disable-gpu","--headless", "--no-sandbox"] } }, "http://chrome:4444/wd/hub"]'\''|g' /var/farmOS/phpunit.xml \
+  && sed -i 's|\./|\./web/core/|g' /var/farmOS/phpunit.xml \
+  && sed -i 's|\.\./web/core/|\./web/|g' /var/farmOS/phpunit.xml \
+  && sed -i 's|  </php>|    <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>'"\n"'  </php>|g' /var/farmOS/phpunit.xml \
+  && mkdir -p /var/farmOS/web/sites/simpletest/browser_output
+
+# Set the version in farm.info.yml to match the version locked by Composer.
+# This is optional but is useful because the version will appear as the
+# "Installation Profile" version at `/admin/reports/status` in farmOS.
+RUN sed -i "s|version: 3.x|version: $(jq -r '.packages[] | select(.name == "farmos/farmos").version' /var/farmOS/composer.lock)|g" /var/farmOS/web/profiles/farm/farm.info.yml
+
+# Change back to the root user.
+USER root
+
+# Copy codebase into /opt/drupal.
+RUN chown -R www-data:www-data /var/farmOS/web/sites
+RUN cp -rp /var/farmOS /opt/drupal
+
+WORKDIR /opt/drupal
+CMD ["apache2-foreground"]

@@ -1,0 +1,25 @@
+# Ignore everything.
+**
+
+# Include composer files.
+!composer.json
+!composer.lock
+!composer-branch.json
+!composer-branch.lock
+!composer-dev.json
+!composer-dev.lock
+
+# Include web/modules/custom/
+!web/modules/
+web/modules/*
+!web/modules/custom/
+
+# Include web/sites/all
+!web/sites/
+web/sites/*
+!web/sites/all/
+
+# Include test files.
+!tests/phpcs.xml
+!tests/phpstan.neon
+!tests/phpunit.xml

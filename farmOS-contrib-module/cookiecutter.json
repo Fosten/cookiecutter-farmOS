@@ -1,0 +1,16 @@
+{
+    "project_title": "Farm Contrib Module (Must begin with 'Farm ')",
+    "description": "New contrib module for farmOS",
+    "project_slug": "{{ cookiecutter.project_title|slugify(separator='_') }}",
+    "author": "Project Creator",
+    "email": "email@example.com",
+    "github_organization": "farmOS",
+    "__prompts__": {
+        "project_title": "Project Title",
+        "description": "Project Description",
+        "project_slug": "Project Slug (Used for repository id)",
+        "author": "Author",
+        "email": "Author E-mail",
+        "github_organization": "GitHub Username or Organization"
+    }
+}

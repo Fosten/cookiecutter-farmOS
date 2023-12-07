@@ -1,0 +1,28 @@
+name: Redeploy farmOS Release Live CD
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    if: {{ "${{ github.ref == 'refs/heads/main' }}" }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@{{ cookiecutter.__gha_checkout_version }}
+
+      - name: Deploy to cluster
+        uses: kitconcept/docker-stack-deploy@{{ cookiecutter.__gha_docker_stack_version }}
+        with:
+          registry: "ghcr.io"
+          username: {{ "${{ github.actor }}" }}
+          password: {{ "${{ secrets.GITHUB_TOKEN }}" }}
+          remote_host: {{ "${{ vars.DEPLOY_HOST }}" }}
+          remote_port: {{ "${{ vars.DEPLOY_PORT }}" }}
+          remote_user: {{ "${{ vars.DEPLOY_USER }}" }}
+          remote_private_key: {{ "${{ secrets.DEPLOY_SSH }}" }}
+          stack_file: devops/stacks/{{ cookiecutter.production_hostname }}.yml
+          stack_name: {{ cookiecutter.devops_farmos_production_stack_name }}
+          stack_param: {{ "${{ github.ref_name }}" }}
+          env_file: {{ "${{ secrets.ENV_FILE }}" }}
+          deploy_timeout: 480

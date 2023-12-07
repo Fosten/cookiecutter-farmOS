@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  www:
+    image: {{ cookiecutter.__container_image_prefix }}-{{ cookiecutter.farmos_release_version }}:${STACK_PARAM:-latest}
+    networks:
+      - {{ cookiecutter.devops_traefik_public_network }}
+    environment:
+      PROD_DB_NAME: ${PROD_DB_NAME}
+      PROD_DB_USER: ${PROD_DB_USER}
+      DB_HOST: ${DB_HOST}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+    ports:
+      - '81:80'
+    volumes:
+      - farmrelease_default:/opt/drupal/web/sites/default
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.type == {{ cookiecutter.devops_farmos_node_label }}
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network={{ cookiecutter.devops_traefik_public_network }}
+        - traefik.constraint-label=public
+        # SERVICES: Main
+        - traefik.http.services.farmos.loadbalancer.server.port=80
+        # MIDDLEWARES: Main
+        - traefik.http.middlewares.cors.headers.accesscontrolallowmethods=*
+        - traefik.http.middlewares.cors.headers.accesscontrolallowheaders=*
+        - traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist={{ cookiecutter.api_allow_origin }}
+        - traefik.http.middlewares.cors.headers.accesscontrolmaxage=100
+        - traefik.http.middlewares.cors.headers.addvaryheader=true
+        # HOSTS: Main
+        - traefik.http.routers.farmos.rule=Host(`{{ cookiecutter.production_hostname }}`)
+        - traefik.http.routers.farmos.entrypoints=websecure
+        - traefik.http.routers.farmos.tls=true
+        - traefik.http.routers.farmos.tls.certresolver=mydnschallenge
+        - traefik.http.routers.farmos.service=farmos
+        - traefik.http.routers.farmos.middlewares=gzip,cors
+
+volumes:
+  farmrelease_default: {}
+
+networks:
+  {{ cookiecutter.devops_traefik_public_network }}:
+    external: true

@@ -1,0 +1,119 @@
+name: Deploy farmOS Dev CI/CD
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./farmOS
+
+env:
+  IMAGE_NAME_PREFIX: {{ cookiecutter.__container_image_prefix }}-{{ cookiecutter.farmos_branch_version }}-dev
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@{{ cookiecutter.__gha_checkout_version }}
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@{{ cookiecutter.__gha_docker_docker_metadata_version }}
+        with:
+          images: |
+            {{ "${{ env.IMAGE_NAME_PREFIX }}" }}
+          labels: |
+            org.label-schema.docker.cmd=docker run -d -p 80:80 {{ "${{ env.IMAGE_NAME_PREFIX }}" }}:latest
+          flavor:
+            latest=false
+          tags: |
+            type=ref,event=branch
+            type=sha
+            type=raw,value=latest,enable={{ "{{is_default_branch}}" }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@{{ cookiecutter.__gha_docker_docker_qemu_version }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@{{ cookiecutter.__gha_docker_docker_buildx_version }}
+
+      - name: Login to Container Registry
+        uses: docker/login-action@{{ cookiecutter.__gha_docker_docker_login_version }}
+        with:
+          {%- if cookiecutter.container_registry == 'Docker Hub' %}
+          username: {{"${{ secrets.DOCKERHUB_USERNAME }}"}}
+          password: {{"${{ secrets.DOCKERHUB_TOKEN }}"}}
+          {%- endif %}
+          {%- if cookiecutter.container_registry == 'GitHub' %}
+          registry: ghcr.io
+          username: {{"${{ github.actor }}"}}
+          password: {{"${{ secrets.GITHUB_TOKEN }}"}}
+          {%- endif %}
+
+      - name: Build and push
+        uses: docker/build-push-action@{{ cookiecutter.__gha_docker_docker_build_push_version }}
+        with:
+          platforms: linux/amd64
+          load: true
+          context: farmOS/
+          file: farmOS/Dockerfile.dev
+          tags: {{"${{ steps.meta.outputs.tags }}"}}
+          labels: {{"${{ steps.meta.outputs.labels }}"}}
+
+      - name: Start container
+        run: docker run -d --name www {{ "${{ env.IMAGE_NAME_PREFIX }}" }}:latest
+        
+      - name: Run PHP CodeSniffer
+        id: codesniffer
+        run: docker exec -u www-data www phpcs /opt/drupal/web/modules/custom
+
+      - name: Check PHP compatibility of contrib modules and themes (ignore warnings).
+        id: phpcompatibility
+        run: |
+          docker exec -u www-data www phpcs --standard=PHPCompatibility --runtime-set testVersion 8.2- --warning-severity=0 /opt/drupal/web/modules
+          docker exec -u www-data www phpcs --standard=PHPCompatibility --runtime-set testVersion 8.2- --warning-severity=0 /opt/drupal/web/themes
+
+      - name: Run PHPStan
+        id: phpstan
+        run: docker exec -u www-data www phpstan analyze --memory-limit 1G /opt/drupal/web/profiles/farm
+
+#      - name: Run PHPUnit
+#        id: phpunit
+#        run: docker exec -u www-data www phpunit --verbose /opt/drupal/web/profiles/farm
+
+      - name: Report
+        if: {{ "${{ success() || failure() }}" }}
+        run: |
+          echo '# Code Analysis' >> $GITHUB_STEP_SUMMARY
+          echo '| Test | Status |' >> $GITHUB_STEP_SUMMARY
+          echo '| --- | --- |' >> $GITHUB_STEP_SUMMARY
+          {{ "echo '| CodeSniffer | ${{ steps.codesniffer.conclusion == 'failure' && '❌' || ' ✅' }} |' >> $GITHUB_STEP_SUMMARY" }}
+          {{ "echo '| PHP compatibility | ${{ steps.phpcompatibility.conclusion == 'failure' && '❌' || ' ✅' }} |' >> $GITHUB_STEP_SUMMARY" }}
+          {{ "echo '| PHPStan | ${{ steps.phpstan.conclusion == 'failure' && '❌' || ' ✅' }} |' >> $GITHUB_STEP_SUMMARY" }}
+
+      - name: Push image
+        run: |
+          docker push {{ "${{ env.IMAGE_NAME_PREFIX }}" }} --all-tags
+
+  deploy:
+    if: {{ "${{ github.ref == 'refs/heads/main' }}" }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@{{ cookiecutter.__gha_checkout_version }}
+
+      - name: Deploy to cluster
+        uses: kitconcept/docker-stack-deploy@{{ cookiecutter.__gha_docker_stack_version }}
+        with:
+          registry: "ghcr.io"
+          username: {{ "${{ github.actor }}" }}
+          password: {{ "${{ secrets.GITHUB_TOKEN }}" }}
+          remote_host: {{ "${{ vars.DEPLOY_HOST }}" }}
+          remote_port: {{ "${{ vars.DEPLOY_PORT }}" }}
+          remote_user: {{ "${{ vars.DEPLOY_USER }}" }}
+          remote_private_key: {{ "${{ secrets.DEPLOY_SSH }}" }}
+          stack_file: devops/stacks/{{ cookiecutter.development_hostname }}.yml
+          stack_name: {{ cookiecutter.devops_farmos_development_stack_name }}
+          stack_param: {{ "${{ github.ref_name }}" }}
+          env_file: {{ "${{ secrets.ENV_FILE }}" }}
+          deploy_timeout: 480

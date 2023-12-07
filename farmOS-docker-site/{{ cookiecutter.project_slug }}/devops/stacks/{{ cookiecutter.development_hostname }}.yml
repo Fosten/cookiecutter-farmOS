@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  www:
+    image: {{ cookiecutter.__container_image_prefix }}-{{ cookiecutter.farmos_branch_version }}-dev:${STACK_PARAM:-latest}
+    networks:
+      - {{ cookiecutter.devops_traefik_public_network }}
+    environment:
+      DEV_DB_NAME: ${DEV_DB_NAME}
+      DEV_DB_USER: ${DEV_DB_USER}
+      DB_HOST: ${DB_HOST}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+    ports:
+      - '83:80'
+    volumes:
+      - farmdev_default:/opt/drupal/web/sites/default
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.type == {{ cookiecutter.devops_farmos_node_label }}
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network={{ cookiecutter.devops_traefik_public_network }}
+        - traefik.constraint-label=public
+        # SERVICES: Main
+        - traefik.http.services.farmos-dev.loadbalancer.server.port=80
+        # MIDDLEWARES: Main
+        - traefik.http.middlewares.cors.headers.accesscontrolallowmethods=*
+        - traefik.http.middlewares.cors.headers.accesscontrolallowheaders=*
+        - traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist={{ cookiecutter.api_allow_origin }}
+        - traefik.http.middlewares.cors.headers.accesscontrolmaxage=100
+        - traefik.http.middlewares.cors.headers.addvaryheader=true
+        ## farmOS Development Instance Access Authentication
+        ## Defaults to admin:admin
+        - traefik.http.middlewares.farmos-dev-auth.basicauth.users=admin:$$apr1$$uZPT5Fgu$$AmlIdamxT5ipBvPlsdfD70
+        # HOSTS: Main
+        - traefik.http.routers.farmos-dev.rule=Host(`{{ cookiecutter.development_hostname }}`)
+        - traefik.http.routers.farmos-dev.entrypoints=websecure
+        - traefik.http.routers.farmos-dev.tls=true
+        - traefik.http.routers.farmos-dev.tls.certresolver=mydnschallenge
+        - traefik.http.routers.farmos-dev.service=farmos-dev
+        - traefik.http.routers.farmos-dev.middlewares=gzip,cors,farmos-dev-auth
+
+volumes:
+  farmdev_default: {}
+
+networks:
+  {{ cookiecutter.devops_traefik_public_network }}:
+    external: true

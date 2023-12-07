@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  www:
+    image: {{ cookiecutter.__container_image_prefix }}-{{ cookiecutter.farmos_branch_version }}:${STACK_PARAM:-latest}
+    networks:
+      - {{ cookiecutter.devops_traefik_public_network }}
+    environment:
+      TEST_DB_NAME: ${TEST_DB_NAME}
+      TEST_DB_USER: ${TEST_DB_USER}
+      DB_HOST: ${DB_HOST}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_PORT: ${DB_PORT}
+    ports:
+      - '82:80'
+    volumes:
+      - farmtest_default:/opt/drupal/web/sites/default
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.type == {{ cookiecutter.devops_farmos_node_label }}
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network={{ cookiecutter.devops_traefik_public_network }}
+        - traefik.constraint-label=public
+        # SERVICES: Main
+        - traefik.http.services.farmos-testing.loadbalancer.server.port=80
+        # MIDDLEWARES: Main
+        - traefik.http.middlewares.cors.headers.accesscontrolallowmethods=*
+        - traefik.http.middlewares.cors.headers.accesscontrolallowheaders=*
+        - traefik.http.middlewares.cors.headers.accesscontrolalloworiginlist={{ cookiecutter.api_allow_origin }}
+        - traefik.http.middlewares.cors.headers.accesscontrolmaxage=100
+        - traefik.http.middlewares.cors.headers.addvaryheader=true
+        ## farmOS Testing Instance Access Authentication
+        ## Defaults to admin:admin
+        - traefik.http.middlewares.farmos-testing-auth.basicauth.users=admin:$$apr1$$uZPT5Fgu$$AmlIdamxT5ipBvPlsdfD70
+        # HOSTS: Main
+        - traefik.http.routers.farmos-testing.rule=Host(`{{ cookiecutter.testing_hostname }}`)
+        - traefik.http.routers.farmos-testing.entrypoints=websecure
+        - traefik.http.routers.farmos-testing.tls=true
+        - traefik.http.routers.farmos-testing.tls.certresolver=mydnschallenge
+        - traefik.http.routers.farmos-testing.service=farmos-testing
+        - traefik.http.routers.farmos-testing.middlewares=gzip,cors,farmos-testing-auth
+
+volumes:
+  farmtest_default: {}
+
+networks:
+  {{ cookiecutter.devops_traefik_public_network }}:
+    external: true

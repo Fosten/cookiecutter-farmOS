@@ -1,0 +1,40 @@
+# Inherit from the farmOS {{ cookiecutter.farmos_release_version }} image on Docker Hub.
+FROM farmos/farmos:{{ cookiecutter.farmos_release_version }}
+ARG FARM_CONFIG_EXISTS={{ cookiecutter.farm_site_config_exists }}
+ARG FARM_MODULE_EXISTS={{ cookiecutter.farm_contrib_module_exists }}
+
+# Install `jq` to help in extracting the farmOS version below.
+RUN apt-get update && apt-get install -y jq
+
+# Replace exisiting farmOS codebase.
+RUN rm -r /opt/drupal /var/farmOS/* && chown www-data:www-data /var/farmOS
+WORKDIR /var/farmOS
+COPY --chown=www-data:www-data . .
+
+# Configure composer to use a github access token for accessing private repos.
+#RUN --mount=type=secret,id=github_access_token,uid=1000 \
+#  composer config github-oauth.github.com $(cat /run/secrets/github_access_token)
+
+# Install composer.
+RUN composer config cache-dir $(mktemp -d)
+RUN composer require "farmos/farmos:{{ cookiecutter.farmos_release_version }}" --no-install
+RUN if [ "$FARM_CONFIG_EXISTS" = "1" ]; then \
+  composer require "{{ cookiecutter.github_organization }}/{{ cookiecutter.farm_site_config_name }}:*" --no-install \
+  ;fi
+RUN if [ "$FARM_MODULE_EXISTS" = "1" ]; then \
+  composer require "{{ cookiecutter.github_organization }}/{{ cookiecutter.farm_contrib_module_name }}:*" --no-install \
+  ;fi
+RUN composer install --no-dev
+RUN composer clear-cache
+
+# Set the version in farm.info.yml to match the version locked by Composer.
+# This is optional but is useful because the version will appear as the
+# "Installation Profile" version at `/admin/reports/status` in farmOS.
+RUN sed -i "s|version: 3.x|version: $(jq -r '.packages[] | select(.name == "farmos/farmos").version' /var/farmOS/composer.lock)|g" /var/farmOS/web/profiles/farm/farm.info.yml
+
+# Copy codebase into /opt/drupal.
+RUN chown -R www-data:www-data /var/farmOS/web/sites
+RUN cp -rp /var/farmOS /opt/drupal
+
+WORKDIR /opt/drupal
+CMD ["apache2-foreground"]

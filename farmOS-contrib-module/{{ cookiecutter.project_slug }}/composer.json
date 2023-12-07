@@ -1,0 +1,14 @@
+{
+  "name": "{{ cookiecutter.github_organization }}/{{ cookiecutter.project_slug }}",
+  "description": "{{ cookiecutter.description }}",
+  "type": "drupal-module",
+  "authors": [
+      {
+          "name": "{{ cookiecutter.author }}",
+          "email": "{{ cookiecutter.email }}"
+      }
+  ],
+  "require": {
+    "farmos/farmos": "^3.0"
+  }
+}

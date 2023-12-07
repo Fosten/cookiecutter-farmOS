@@ -1,0 +1,16 @@
+{
+    "template": [
+      "config (./farmOS-site-config)",
+      "module (./farmOS-contrib-module)",
+      "site (./farmOS-docker-site)"
+    ],
+    "__prompts__": {
+      "template": {
+        "__prompt__": "Select a template",
+        "config (./farmOS-site-config)": "farmOS Site Config",
+        "module (./farmOS-contrib-module)": "farmOS Contrib Module",
+        "site (./farmOS-docker-site)": "farmOS Docker Site"
+      }
+    }
+  }
+  

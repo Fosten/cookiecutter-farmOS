@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - farm_map
+    - farm_settings
+    - role_delegation
+  enforced:
+    module:
+      - {{ cookiecutter.project_slug }}
+id: farm_admin
+label: 'Farm admin'
+weight: 2
+is_admin: null
+permissions:
+  - 'administer farm map'
+  - 'administer farm settings'
+  - 'administer users'
+third_party_settings:
+  farm_role:
+    access:
+      config: true
+      entity:
+        view all: true
+        create all: true
+        update all: true
+        delete all: true

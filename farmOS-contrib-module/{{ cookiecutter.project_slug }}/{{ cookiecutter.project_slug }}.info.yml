@@ -1,0 +1,7 @@
+name: farmOS Contrib Module
+type: module
+description: An example farmOS contrib module.
+package: farmOS Contrib
+core_version_requirement: ^10
+dependencies:
+  - farm_entity
