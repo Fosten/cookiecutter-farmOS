@@ -41,7 +41,7 @@
   "__gha_docker_stack_version": "v1.2.0",
   "__gha_docker_docker_metadata_version": "v5",
   "__gha_docker_docker_qemu_version": "v3",
-  "__gha_docker_docker_buildx_version": "v3",
+  "__gha_docker_docker_buildx_version": "v3.2.0",
   "__gha_docker_docker_login_version": "v3",
   "__gha_docker_docker_build_push_version": "v4",
   "__devops_traefik_version": "v2.10.4",
