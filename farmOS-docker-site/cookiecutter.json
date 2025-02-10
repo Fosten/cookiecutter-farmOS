@@ -6,7 +6,7 @@
   "testing_hostname": "farmtest.example.com",
   "development_hostname": "farmdev.example.com",
   "traefik_hostname": "traefik.example.com",
-  "api_allow_origin": "example.com",
+  "api_allow_origin": "https://example.com",
   "author": "Project Creator",
   "email": "email@example.com",
   "farmos_release_version": "{{ '3.3.3' }}",
