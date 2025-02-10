@@ -5,9 +5,9 @@ services:
     networks:
       - {{ cookiecutter.devops_farmos_private_network }}-dev
     volumes:
-      - './dev-db:/var/lib/postgresql/data'
+      - ./dev-db:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - 5432:5432
     environment:
       POSTGRES_USER: farm
       POSTGRES_PASSWORD: farm
@@ -20,9 +20,9 @@ services:
     networks:
       - {{ cookiecutter.devops_farmos_private_network }}-dev
     volumes:
-      - './dev-www:/opt/drupal/web/sites/default'
+      - ./dev-www:/opt/drupal/web/sites/default
     ports:
-      - '80:80'
+      - 80:80
     environment:
       XDEBUG_MODE: debug
       XDEBUG_CONFIG: client_host=172.17.0.1

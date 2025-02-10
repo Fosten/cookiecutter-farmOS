@@ -1,8 +1,8 @@
-version: "3.9"
+version: '3.9'
 
 services:
   traefik:
-    image: "traefik:{{ cookiecutter.__devops_traefik_version }}"
+    image: traefik:{{ cookiecutter.__devops_traefik_version }}
     command:
       - --log.level=INFO
       - --log.filePath=/var/log/traefik/traefik.log
@@ -16,10 +16,10 @@ services:
       - --api
       - --api.dashboard=true
       # DNS Resolver
-      - "--certificatesresolvers.mydnschallenge.acme.dnschallenge=true"
-      - "--certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=linodev4"
-      - "--certificatesresolvers.mydnschallenge.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.mydnschallenge.acme.storage=/le/acme.json"
+      - --certificatesresolvers.mydnschallenge.acme.dnschallenge=true
+      - --certificatesresolvers.mydnschallenge.acme.dnschallenge.provider=linodev4
+      - --certificatesresolvers.mydnschallenge.acme.email=${ACME_EMAIL}
+      - --certificatesresolvers.mydnschallenge.acme.storage=/le/acme.json
       # Enable the access log, with HTTP requests
       - --accesslog.bufferingsize=100
       - --accesslog.filepath=/var/log/traefik/traefik-access.log        
@@ -43,10 +43,10 @@ services:
       ACME_EMAIL: ${ACME_EMAIL}
       LINODE_TOKEN: ${LINODE_TOKEN}
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       # Make sure the volume folder is created
-      - "${HOME}/traefik/data/acme.json:/le/acme.json"
-      - "${HOME}/traefik/logs/:/var/log/traefik"
+      - ${HOME}/traefik/data/acme.json:/le/acme.json
+      - ${HOME}/traefik/logs/:/var/log/traefik
     deploy:
       replicas: 1
       placement:
@@ -54,15 +54,15 @@ services:
           - node.labels.type == {{ cookiecutter.devops_traefik_node_label }}
       labels:
         # Dashboard
-        - "traefik.enable=true"
+        - traefik.enable=true
         # Change the host url here
-        - "traefik.http.routers.traefik.rule=Host(`{{ cookiecutter.traefik_hostname }}`)"
-        - "traefik.http.routers.traefik.service=api@internal"
-        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
-        - "traefik.http.routers.traefik.tls=true"
-        - "traefik.http.routers.traefik.tls.certresolver=mydnschallenge"
-        - "traefik.http.routers.traefik.entrypoints=websecure"
-        - "traefik.http.routers.traefik.middlewares=gzip,authtraefik"
+        - traefik.http.routers.traefik.rule=Host(`{{ cookiecutter.traefik_hostname }}`)
+        - traefik.http.routers.traefik.service=api@internal
+        - traefik.http.services.traefik.loadbalancer.server.port=8080
+        - traefik.http.routers.traefik.tls=true
+        - traefik.http.routers.traefik.tls.certresolver=mydnschallenge
+        - traefik.http.routers.traefik.entrypoints=websecure
+        - traefik.http.routers.traefik.middlewares=gzip,authtraefik
         ## Basic Authentication
         ### Note: all dollar signs in the hash need to be doubled for escaping.
         ### To create user:password pair, it's possible to use this command:
@@ -71,15 +71,15 @@ services:
         - traefik.http.middlewares.authtraefik.basicauth.users=admin:$$apr1$$uZPT5Fgu$$AmlIdamxT5ipBvPlsdfD70
         
         # global redirect to https
-        - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
-        - "traefik.http.routers.http-catchall.entrypoints=web"
-        - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+        - traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)
+        - traefik.http.routers.http-catchall.entrypoints=web
+        - traefik.http.routers.http-catchall.middlewares=redirect-to-https
 
         # middleware redirect
-        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
 
         # middleware compress
-        - "traefik.http.middlewares.gzip.compress=true"
+        - traefik.http.middlewares.gzip.compress=true
 
 networks:
   {{ cookiecutter.devops_traefik_public_network }}:
