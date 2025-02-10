@@ -9,7 +9,7 @@
   "api_allow_origin": "example.com",
   "author": "Project Creator",
   "email": "email@example.com",
-  "farmos_release_version": "{{ '3.0.0-beta3' }}",
+  "farmos_release_version": "{{ '3.3.3' }}",
   "farmos_branch_version": "{{ '3.x' }}",
   "farm_site_config_exists": [
     "1",
