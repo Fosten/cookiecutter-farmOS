@@ -10,8 +10,6 @@ services:
       DB_HOST: ${DB_HOST}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: ${DB_PORT}
-    ports:
-      - '83:80'
     volumes:
       - farmdev_default:/opt/drupal/web/sites/default
     deploy:
