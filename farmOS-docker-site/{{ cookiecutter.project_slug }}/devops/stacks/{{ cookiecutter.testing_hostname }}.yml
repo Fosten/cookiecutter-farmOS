@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 services:
   www:
     image: {{ cookiecutter.__container_image_prefix }}-{{ cookiecutter.farmos_branch_version }}:${STACK_PARAM:-latest}
