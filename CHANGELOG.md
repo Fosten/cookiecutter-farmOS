@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-# 1.2.0 (Unreleased)
+## 1.2.0 (Unreleased)
 
 - Add CHANGELOG.md in cookiecutter-farmOS [fosten]
 - Add CHANGELOG.md in cookiecutter.project_slug [fosten]
@@ -15,10 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change GHA versions to major releases [fosten]
 - Bump farmos_release_version from 3.0.0-beta3 to 3.3.3 [fosten]
 
-# 1.1.0 (2024-06-15)
+## 1.1.0 (2024-06-15)
 
 - Add dependabot [fosten]
 
-# 1.0.0 (2023-12-06)
+## 1.0.0 (2023-12-06)
 
 - Initial commit [fosten]
