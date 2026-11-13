@@ -74,7 +74,7 @@ jobs:
 
       - name: Run PHPStan
         id: phpstan
-        run: docker exec -u www-data www phpstan analyze --memory-limit 1G /opt/drupal/web/profiles/farm
+        run: docker exec -u www-data www phpstan analyze -l 5 --memory-limit 1G /opt/drupal/web/profiles/farm
 
 #      - name: Run PHPUnit
 #        id: phpunit

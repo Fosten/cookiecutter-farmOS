@@ -1,9 +1,16 @@
 parameters:
-  level: 1
+  level: 5
+  reportUnmatchedIgnoredErrors: true
   ignoreErrors:
     # new static() is a best practice in Drupal, so we cannot fix that.
     - '#^Unsafe usage of new static#'
   scanDirectories:
     # Tell PHPStan where to find GeoPHP classes.
     - vendor/itamair/geophp
-    
+  drupal:
+    rules:
+      testClassSuffixNameRule: false
+      dependencySerializationTraitPropertyRule: true
+      accessResultConditionRule: true
+      classExtendsInternalClassRule: true
+      pluginManagerInspectionRule: false
