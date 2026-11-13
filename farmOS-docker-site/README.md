@@ -9,36 +9,43 @@ Powered by [Cookiecutter](https://github.com/cookiecutter/cookiecutter), [Cookie
 
 ### Prerequisites
 
-- **pipx**: A handy tool for installing and running Python applications.
+* [uv](https://docs.astral.sh/uv/): A fast Python package and project manager.
 - **Docker**: For containerization and easy deployment.
 
-### Installation Guide 🛠️
+## Installation Guide 🛠️
 
-1. **pipx**
+### Installing uv
 
-```shell
-pip install pipx
+If you don't already have uv installed, follow the
+[official installation instructions](https://docs.astral.sh/uv/getting-started/installation/).
+
+**macOS / Linux:**
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-2. **Docker**
+### Installing Docker
 
 Visit the [official documentation](https://docs.docker.com/get-docker/) for installation guides.
 
 ### Generate Your farmOS Project 🎉
 
-```shell
-pipx run cookiecutter gh:collective/cookiecutter-farmos
+Start the program:
+
+```bash
+uvx cookiecutter gh:fosten/cookiecutter-farmOS
 ```
+
 Then select the `farmOS Docker Site` template.
 
-Note: While not required, you will likely want to run these cookiecutter templates first:
+**Note:** Although optional, it is recommended to generate the following templates before creating your `farmOS Docker Site` so they can be included in your Docker image:
 - `farmOS Site Config`
 - `farmOS Contrib Module`
-so they can be included in your `farmOS Docker Site` image.
 
 ## Project Generation Options 🛠️
 
-Every project is unique, and we provide a variety of options to ensure that your farmOS project aligns with your specific needs. Here are the options you can customize during the generation process:
+Every project is unique, and this repo provides a variety of options to ensure that your farmOS project aligns with your specific needs. Here are the options you can customize during the generation process:
 
 | Option                | Description                                                                                                                                          | Example                       |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |

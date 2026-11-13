@@ -9,19 +9,25 @@ Powered by [Cookiecutter](https://github.com/cookiecutter/cookiecutter), [Cookie
 
 ### Prerequisites
 
-- **pipx**: A handy tool for installing and running Python applications.
+* [uv](https://docs.astral.sh/uv/): A fast Python package and project manager.
 
-### Installation Guide 🛠️
+## Installation Guide 🛠️
 
-1. **pipx**
+### Installing uv
 
-```shell
-pip install pipx
+If you don't already have uv installed, follow the
+[official installation instructions](https://docs.astral.sh/uv/getting-started/installation/).
+
+**macOS / Linux:**
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+
 ### Generate Your farmOS Site Config Module 🎉
 
-```shell
-pipx run cookiecutter gh:fosten/cookiecutter-farmOS
+```bash
+uvx cookiecutter gh:fosten/cookiecutter-farmOS
 ```
 Then select the `farmOS Site Config` template.
 

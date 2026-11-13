@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Replace pipx with uvx in README.md [fosten]
 - Bump PHPStan from level 1 to level 5 [fosten]
 - Bump Traefik from v2.10.4 to v3.7, GHA to latest [fosten]
 - Bump farmOS from 3 to 4, Drupal from 10 to 11, Postgres from 15 to 17  [fosten]

@@ -7,31 +7,37 @@ Welcome to Cookiecutter farmOS! Your one-stop solution to kickstart farmOS proje
 ## Features ✨
 - Compatible with all farmOS 4.x images!
 - Works with Traefik and Docker Swarm Mode!
-- Includes GHA Workflows to automate your deployments!
+- Includes GitHub Actions workflows to automate your deployments!
 
 ## Getting Started 🏁
 
 ### Prerequisites
 
-- **pipx**: A handy tool for installing and running Python applications.
+* [uv](https://docs.astral.sh/uv/): A fast Python package and project manager.
 
-### Installation Guide 🛠️
+## Installation Guide 🛠️
 
-**pipx**
+### Installing uv
 
-```shell
-pip install pipx
+If you don't already have uv installed, follow the
+[official installation instructions](https://docs.astral.sh/uv/getting-started/installation/).
+
+**macOS / Linux:**
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### Run cookiecutter farmOS 🎉
+### Run Cookiecutter farmOS 🎉
 
 Start the program:
 
-```shell
-pipx run cookiecutter gh:fosten/cookiecutter-farmOS
+```bash
+uvx cookiecutter gh:fosten/cookiecutter-farmOS
 ```
 
-And choose a template:
+Cookiecutter will prompt you to select a template:
+
 ```
   [1/1] Select a template
     1 - farmOS Site Config
@@ -39,25 +45,23 @@ And choose a template:
     3 - farmOS Docker Site
 ```
 
-Note: While not required, you will likely want to run these cookiecutter templates first:
+**Note:** Although optional, it is recommended to generate the following templates before creating your `farmOS Docker Site` so they can be included in your Docker image:
 - `farmOS Site Config`
 - `farmOS Contrib Module`
 
-so they can be included in your `farmOS Docker Site` image.
-
-
 ## farmOS Cookiecutter Template Options 🛠️
 
-| Template | Description |  |
+| Template | Description | Documentation |
 | --------- | --------- | --------- |
-| `farmOS Site Config`  | Creates a new site config to be used with farmOS | [Read More](./farmOS-site-config/README.md) |
-| `farmOS Contrib Module`  | Creates a new contrib module to be used with farmOS | [Read More](./farmOS-contrib-module/README.md) |
-| `farmOS Docker Site`  | Creates a farmOS docker site with Traefik | [Read More](./farmOS-docker-site/README.md) |
+| `farmOS Site Config`  | Creates a new site config to be used with farmOS | [View README](./farmOS-site-config/README.md) |
+| `farmOS Contrib Module`  | Creates a new contrib module to be used with farmOS | [View README](./farmOS-contrib-module/README.md) |
+| `farmOS Docker Site`  | Creates a farmOS Docker site with Traefik | [View README](./farmOS-docker-site/README.md) |
 
 
-## Push to repository
-After generating a new project from one of the templates, you can commit this project to a repository.
-```shell
+## Push to Repository
+After generating a project from one of the templates, initialize a Git repository and push your project to GitHub:
+
+```bash
 git init
 git add .
 git commit -m "Initial commit"
@@ -68,7 +72,7 @@ git push -u origin main
 
 ## License 📜
 
-This project is licensed under the [MIT License](/LICENSE).
+This project is licensed under the [MIT License](./LICENSE).
 
 ## Credits and Acknowledgements 🙏
 
