@@ -7,13 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## 1.1.0 2023-11-02
+### Added
+
+- Add support for Drupal 10 and farmOS v4.
+
+## 1.1.0 (2023-11-02)
 
 ### Added
 
 - Add support for Drupal 10 and farmOS v3.
 
-## 1.0.0 2023-03-17
+## 1.0.0 (2023-03-17)
 
 ### Added
 

@@ -5,7 +5,7 @@
 Welcome to Cookiecutter farmOS! Your one-stop solution to kickstart farmOS projects with ease and efficiency. Powered by [Cookiecutter](https://github.com/cookiecutter/cookiecutter), these templates are designed to save you time and ensure that you get started on the right foot. 🚀
 
 ## Features ✨
-- Compatible with all farmOS 3.x images!
+- Compatible with all farmOS 4.x images!
 - Works with Traefik and Docker Swarm Mode!
 - Includes GHA Workflows to automate your deployments!
 

@@ -30,7 +30,7 @@ RUN composer clear-cache
 # Set the version in farm.info.yml to match the version locked by Composer.
 # This is optional but is useful because the version will appear as the
 # "Installation Profile" version at `/admin/reports/status` in farmOS.
-RUN sed -i "s|version: 3.x|version: $(jq -r '.packages[] | select(.name == "farmos/farmos").version' /var/farmOS/composer.lock)|g" /var/farmOS/web/profiles/farm/farm.info.yml
+RUN sed -i "s|version: 4.x|version: $(jq -r '.packages[] | select(.name == "farmos/farmos").version' /var/farmOS/composer.lock)|g" /var/farmOS/web/profiles/farm/farm.info.yml
 
 # Copy codebase into /opt/drupal.
 RUN chown -R www-data:www-data /var/farmOS/web/sites

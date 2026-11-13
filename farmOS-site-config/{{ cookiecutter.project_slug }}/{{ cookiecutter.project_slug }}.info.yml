@@ -2,7 +2,7 @@ name: farmOS Site Configuration
 type: module
 description: Module to help configure and administer farmOS sites
 package: farmOS Contrib
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^11
 dependencies:
   - farm_role
   - role_delegation:role_delegation

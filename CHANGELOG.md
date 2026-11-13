@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Bump farmOS from 3 to 4, Drupal from 10 to 11, Postgres from 15 to 17  [fosten]
 - Update CHANGELOG.md with reference-style link definitions [fosten]
 
 ## [1.2.0] (2025-02-11)

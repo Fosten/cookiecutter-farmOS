@@ -11,6 +11,6 @@
   "require": {
     "drupal/role_delegation": "^1.2",
     "drupal/userprotect": "^1.2",
-    "farmos/farmos": "^3.0"
+    "farmos/farmos": "^4.0"
   }
 }
